@@ -88,79 +88,89 @@ template<typename T> T* searchName(SoNode* scene, SbName name);
  */
 SoNode* generateSyntheticHorizon(SoVolumeData* volumeData, const float zcenter, const float zscale, const SoUniformGridClipping::Axis axis)
 {
-  SbBox3f volumeBox = volumeData->extent.getValue();
-  SoSeparator* shapeSep = new SoSeparator;
+    SbBox3f volumeBox = volumeData->extent.getValue();
+    SoSeparator* shapeSep = new SoSeparator;
 
-  // By default elevation is generated on Y axis
-  // then change the index indirection to generate on correct axis
-  SbVec3i32 axisOrder;
-  switch (axis)
-  {
-  case SoUniformGridClipping::X : axisOrder = SbVec3i32(2,0,1); break;
-  case SoUniformGridClipping::Y : axisOrder = SbVec3i32(0,1,2); break;
-  case SoUniformGridClipping::Z : axisOrder = SbVec3i32(1,2,0); break;
-  }
-
-  // We generate a synthetic shape in range [-1,-1,-1] [1,1,1] range
-  SoTransform* transform = new SoTransform;
-  transform->translation = volumeBox.getCenter();
-  transform->scaleFactor = volumeBox.getSize()/2.0;
-
-  shapeSep->addChild(transform);
-
-  static bool once = true;
-  if (once) {
-      SoJackManip *jack = new SoJackManip();
-      shapeSep->addChild(jack);
-      once = false;
-  }
-
-  // setup two side lighting
-  SoShapeHints *shapeHints = new SoShapeHints;
-  shapeHints->vertexOrdering = SoShapeHints::COUNTERCLOCKWISE;
-  shapeSep->addChild(shapeHints);
-
-  SoQuadMesh* IShape = new SoQuadMesh;
-  SoVertexProperty* vp = new SoVertexProperty;
-  IShape->vertexProperty.setValue(vp);
-
-  // Define the resolution of the HeightMap
-  float sizeX=SYNTHETIC_SIZE;
-  float sizeY=SYNTHETIC_SIZE;
-
-  // Define the range of the synthetic HeightMap
-  SbVec3f vmin(-1,-1,-0.2f);
-  SbVec3f vmax( 1, 1, 0.2f);
-
-  SbVec3f vrange(vmax-vmin);
-  float deltaX =vrange[0]/sizeX;
-  float deltaY =vrange[1]/sizeY;
-
-
-  // setup vertices
-  vp->vertex.setNum(int(sizeX*sizeY));
-  SbVec3f* vertices = vp->vertex.startEditing();
-  for (int vy=0;vy<sizeY;++vy)
-  {
-    for (int vx=0;vx<sizeX;++vx)
+    // By default elevation is generated on Y axis
+    // then change the index indirection to generate on correct axis
+    SbVec3i32 axisOrder;
+    switch (axis)
     {
-      float elevation = sin( 3*((float)vx/float(sizeX) + 4*(float)(vy)/float(sizeY) ) );
-      elevation/= (2.0f/vrange[2]);
-      (*vertices)[axisOrder[0]] = (float)vmin[0]+vx*deltaX ;
-      (*vertices)[axisOrder[1]] = (float)elevation*zscale + zcenter ;
-      (*vertices)[axisOrder[2]] = (float)vmin[1]+vy*deltaY ;
-      ++vertices;
+    case SoUniformGridClipping::X: axisOrder = SbVec3i32(2, 0, 1); break;
+    case SoUniformGridClipping::Y: axisOrder = SbVec3i32(0, 1, 2); break;
+    case SoUniformGridClipping::Z: axisOrder = SbVec3i32(1, 2, 0); break;
     }
-  }
-  vp->vertex.finishEditing();
 
-  // setup indices
-  IShape->verticesPerColumn = int(sizeX);
-  IShape->verticesPerRow = int(sizeY);
+    // We generate a synthetic shape in range [-1,-1,-1] [1,1,1] range
+    SoTransform* transform = new SoTransform;
+    transform->translation = volumeBox.getCenter();
+    transform->scaleFactor = volumeBox.getSize() / 2.0;
 
-  shapeSep->addChild(IShape);
+    shapeSep->addChild(transform);
 
-  return shapeSep;
+    static bool once = true;
+    if (once) {
+        SoJackManip *jack = new SoJackManip();
+        shapeSep->addChild(jack);
+        once = false;
+    }
+
+    // setup two side lighting
+    SoShapeHints *shapeHints = new SoShapeHints;
+    shapeHints->vertexOrdering = SoShapeHints::COUNTERCLOCKWISE;
+    shapeSep->addChild(shapeHints);
+
+    SoQuadMesh* IShape = new SoQuadMesh;
+    SoVertexProperty* vp = new SoVertexProperty;
+    IShape->vertexProperty.setValue(vp);
+
+    // Define the resolution of the HeightMap
+    float sizeX = SYNTHETIC_SIZE;
+    float sizeY = SYNTHETIC_SIZE;
+
+    // Define the range of the synthetic HeightMap
+    SbVec3f vmin(-1, -1, -0.2f);
+    SbVec3f vmax(1, 1, 0.2f);
+
+    SbVec3f vrange(vmax - vmin);
+    float deltaX = vrange[0] / sizeX;
+    float deltaY = vrange[1] / sizeY;
+
+
+    // setup vertices
+    vp->vertex.setNum(int(sizeX*sizeY));
+    SbVec3f* vertices = vp->vertex.startEditing();
+    for (int vy = 0; vy < sizeY; ++vy)
+    {
+        for (int vx = 0; vx < sizeX; ++vx)
+        {
+            float elevation = sin(3 * ((float)vx / float(sizeX) + 4 * (float)(vy) / float(sizeY)));
+            elevation /= (2.0f / vrange[2]);
+            {
+                float v0 = (*vertices)[axisOrder[0]] = (float)vmin[0] + vx*deltaX;
+                float v1 = (*vertices)[axisOrder[2]] = (float)vmin[1] + vy*deltaY;
+
+                v0 -= zcenter;
+                v1 -= zcenter;
+
+                if (sqrtf(v0*v0 + v1*v1) < 0.5f) {
+                    (*vertices)[axisOrder[1]] = std::numeric_limits<float>::quiet_NaN();
+                } else {
+                    (*vertices)[axisOrder[1]] = (float)elevation*zscale + zcenter;
+                }
+            }
+            ++vertices;
+        }
+    }
+    vp->vertex.finishEditing();
+
+    // setup indices
+    IShape->verticesPerColumn = int(sizeX);
+    IShape->verticesPerRow = int(sizeY);
+
+    shapeSep->addChild(IShape);
+
+    return shapeSep;
 }
 
 /**
