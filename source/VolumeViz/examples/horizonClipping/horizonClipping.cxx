@@ -53,6 +53,8 @@
 #include <Inventor/nodes/SoVertexProperty.h>
 #include <Inventor/nodes/SoTransform.h>
 
+#include <Inventor/manips/SoJackManip.h>
+
 #include <VolumeViz/nodes/SoVolumeData.h>
 #include <VolumeViz/nodes/SoVolumeRendering.h>
 #include <VolumeViz/nodes/SoVolumeRenderingQuality.h>
@@ -105,6 +107,13 @@ SoNode* generateSyntheticHorizon(SoVolumeData* volumeData, const float zcenter, 
   transform->scaleFactor = volumeBox.getSize()/2.0;
 
   shapeSep->addChild(transform);
+
+  static bool once = true;
+  if (once) {
+      SoJackManip *jack = new SoJackManip();
+      shapeSep->addChild(jack);
+      once = false;
+  }
 
   // setup two side lighting
   SoShapeHints *shapeHints = new SoShapeHints;

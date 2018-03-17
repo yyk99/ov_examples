@@ -31,6 +31,9 @@
 	    whichChild -3
 
 	    DEF Horizon1 Separator {
+#                JackManip {
+#                }
+
 	    }
 	    DEF Horizon2 Separator {
 	    }

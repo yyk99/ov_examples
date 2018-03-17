@@ -2,6 +2,9 @@
 #
 #
 *.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
 
 # Prerequisites
 *.d
