@@ -1,0 +1,61 @@
+
+set(subdirectories
+ GL_VolumeRender
+ segmentedInterpolation
+ volumeDataDrawStyle
+ edge2D
+ surfaceScalar
+ colorMap
+ CSGClippingGroup
+ editing
+ getLDMData
+ horizonClipping
+ multiData
+ roiManip
+ simpleIsosurface
+ simpleLightedVolume
+ simpleVolume
+ simpleVolumeAxis
+ simpleShader
+ volumeProjection
+ volumeSkin
+ volumeGeometry
+ simpleClippingGroup
+ volumeTransform
+ CustomReader
+ CustomWriter
+ simpleHorizon
+ simpleHorizonInMemory
+ simpleHorizonRGBA
+ simpleGridClipping
+ fenceSlice
+ dataTransform
+ multiVolumes
+ multiChannel
+ multiTransferFunctions
+ LargeSliceSupport
+ customTags
+ customCompressor
+ simpleShadows
+ simpleInteractiveParameters
+ simpleVolumeMask
+ simpleSliceRGBA
+ volumeMaskEditing
+ volumeDataEditing
+ volumePipeClipping
+ volumeExtract
+ volumePickingGpu
+ ambientOcclusion
+ deferredLighting
+ horizonIsolines
+ physicalRendering
+)
+
+foreach(subdirectory ${subdirectories})
+ add_subdirectory(${subdirectory})
+endforeach(subdirectory)
+
+if(OIV_ENABLE_QT_DEMOS)
+  add_subdirectory(simpleVvizViewer)
+  add_subdirectory(DicomSimpleViewer)
+endif()

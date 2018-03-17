@@ -1,0 +1,62 @@
+#Inventor V2.1 ascii
+
+TopLevelDialog {
+  label "VolumeViz Projection Grid Clipping"
+  minWidth 1
+  minHeight 1
+
+  DialogCustom {
+    auditorID "Viewer"
+    width  600
+    height 600
+  }
+
+  ColumnDialog {
+  fixedHeight TRUE
+
+  # Left dialog
+  RowDialog {
+     DialogCheckBox
+     {
+       label "Dual Clipping"
+       auditorID "ClippingMode"
+       state TRUE
+     }
+     DialogCheckBox
+     {
+       label "Show Geometry"
+       auditorID "ShowHorizon"
+       state TRUE
+     }
+    DialogComboBox {
+      auditorID "RenderMode"
+      labelAlignment CENTER
+      label "Render Mode "
+    }     
+   } # End Right Dialog
+
+
+   # Right Dialog
+   RowDialog {
+    DialogRealSlider
+    {
+      auditorID "Thickness"
+	    min 0
+      max 1
+      value 0
+      label "Thickness"
+      continuousTrigger TRUE
+      fixedLimits FALSE
+      fixedHeight TRUE
+    }
+
+    DialogCheckBox
+    {
+      label "Show LDM Topology"
+      auditorID "ShowTopology"
+      state FALSE
+    }
+   } # End Right Dialog
+  }
+}
+

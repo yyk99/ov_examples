@@ -1,0 +1,157 @@
+#Inventor V8.0 ascii
+
+ Separator {
+
+  GradientBackground {
+  }
+
+  InteractiveComplexity {
+	 fieldSettings [ 2 ,
+	    "SoVolumeRender samplingAlignment BOUNDARY_ALIGNED SMOOTH_BOUNDARY_ALIGNED" ,
+	    "SoComplexity value 0.2 0.5" ]
+      refinementDelay 0
+  }
+  Scale {
+    scaleFactor 1 1 4
+  }
+  
+  DEF HorizonsSep Separator {
+    PolygonOffset {
+      factor -1
+      units 0
+    }
+    DrawStyle {
+      #style LINES
+    }
+    Material {
+      #transparency 0.5
+    }
+    # Horizon geometry
+    DEF HorizonSwitch Switch {
+	    whichChild -3
+
+	    DEF Horizon1 Separator {
+	    }
+	    DEF Horizon2 Separator {
+	    }
+	  }
+	}
+	
+	
+  VolumeData {
+	  fileName "$OIVHOME/examples/source/VolumeViz/Data/colt-float.ldm"
+	 }
+	TransferFunction {
+	  predefColorMap SEISMIC
+		minValue 10
+		maxValue 250
+	}	 
+	 
+	 # ClippingSwitch
+   DEF ClippingSwitch Switch {
+	 whichChild -3
+	 
+	 DEF HorizonClipping1 Group {
+	   TextureUnit {
+	    unit 0x3
+	   }
+	   DEF clip1 UniformGridProjectionClipping {
+	     axis Y
+	     clipBelow TRUE 
+	     clipAbove FALSE 		 
+	     sceneGraph 
+	     USE Horizon1
+	   }
+	  }
+	 DEF HorizonClipping2 Group {
+	   TextureUnit {
+	     unit 0x4
+	   }
+	   DEF clip2 UniformGridProjectionClipping {
+	     axis Y
+	     clipBelow FALSE 
+	     clipAbove TRUE 
+	     sceneGraph 
+	     USE Horizon2
+	   }
+	   TextureUnit {
+	    unit 0x0
+	   }	   
+	 }
+	} # ClippingSwitch end
+	
+	# VolumeRendering
+  DEF VolumeRenderingSwitch Switch {
+	 DEF VolumeRender Separator {
+
+    Complexity {
+    }
+
+	  PickStyle {
+		 style UNPICKABLE
+	  }
+	  
+	  VolumeRenderingQuality {
+		 forVolumeOnly TRUE 
+     deferredLighting TRUE
+     ambientOcclusion TRUE
+	  }
+	  
+	  VolumeRender {
+		 lowScreenResolutionScale 2
+		 useEarlyZ TRUE
+		 subdivideTile TRUE 
+		 gpuVertexGen TRUE 
+		 lowResMode DECREASE_SCREEN_RESOLUTION
+     opacityThreshold 0.1
+     numSlicesControl AUTOMATIC
+	  }
+	}
+	 DEF SkinRender Separator {
+     ROI {
+      box 80 0 15 141 361 44
+     }
+     VolumeSkin {
+	     interpolation MULTISAMPLE_12
+	     alphaUse ALPHA_BINARY
+	     enableBumpMapping TRUE 
+	     faceMode FRONT
+     }
+	 }
+
+	 DEF SliceRender Separator {
+	   OrthoSlice {
+       interpolation MULTISAMPLE_12
+	     axis X
+	     sliceNumber 64
+	     enableBumpMapping TRUE
+	     clipping TRUE	     
+	   }
+	 }
+	 
+	 DEF FenceSliceRender Separator {
+    FenceSlice
+    {
+      interpolation MULTISAMPLE_12
+      axis Y
+	    enableBumpMapping TRUE      
+      points
+      [ 3 ,
+        0.0 47.0,
+        10.0 130.0,
+        57.0 47.0,
+      ]
+    }
+	 }
+
+	 DEF ObliqueSliceRender Separator {
+    ObliqueSlice
+    {
+      interpolation MULTISAMPLE_12
+	    enableBumpMapping TRUE
+	    plane 0.3 0.25 0.9 100
+    }
+	 }
+ } # VolumeRendering switch end
+
+}
